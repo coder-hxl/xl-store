@@ -1,0 +1,50 @@
+<script type="module">
+  import xlStore from './index.js'
+
+  const test = xlStore({
+    state: {
+      info: {
+        name: 'hxl',
+        age: 18,
+      },
+      teachers: [],
+    },
+    actions: {
+      getName() {
+        return this.info.name
+      },
+      setTeachers() {
+        test.teachers = [
+          {
+            name: 'why',
+            other: {
+              age: 18,
+            },
+          },
+          {
+            name: 'pink',
+            other: {
+              age: 20,
+            },
+          },
+          {
+            name: 'hxl',
+            other: {
+              age: 20,
+            },
+          },
+        ]
+      },
+    },
+  })
+
+  // console.log('teachers1', test)
+
+  test.watch('teachers', (value) => {
+    console.log('watch', test)
+  })
+
+  setTimeout(() => {
+    test.setTeachers()
+  }, 1000)
+</script>

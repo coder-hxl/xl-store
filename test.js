@@ -12,23 +12,32 @@ const test = xlStore({
     getName() {
       return this.info.name
     },
-    setName() {
-      this.info.name = 'code'
+    setTeachers() {
+      test.teachers = []
     },
   },
 })
 
-test.watch('teachers', (value) => {
-  console.log(test)
+test.watch('info', (value) => {
+  console.log('info', test.info)
 })
 
-setTimeout(() => {
-  // test.setName()
+test.watch('teachers', (value) => {
+  console.log('teachers1', test)
+})
 
-  test.teachers.splice(0, 1)
+function fn(value) {
+  console.log('teachers2', test.teachers)
+}
+
+test.watch('teachers', fn)
+
+setTimeout(() => {
+  // test.info.score = 666
+  // test.setName = null
 }, 1000)
 
-// setTimeout(() => {
-//   // test.info.teachers[2].age = 18
-//   test.info.age = 18
-// }, 3000)
+setTimeout(() => {
+  test.deleteWatch('teachers', fn)
+  test.setTeachers()
+}, 3000)
