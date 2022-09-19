@@ -1,30 +1,31 @@
 interface IState {
-  [key: string | symbol]: any
+  [key: string]: any
 }
 
 interface IActions {
-  [key: string | symbol]: Function
+  [key: string]: Function
 }
 
-interface IStoreArg<S extends IState, A extends IActions> {
+interface IStoreArg<S = IState, A = IActions> {
   state: S
-  actions: A
+  actions: A & ThisType<S & A>
 }
 
 type ITrackStore = {
   [key: string]: Set<Function>
 }
 
-interface IInstance<S, A> {
+interface IInstance {
   id: number
   trackStore: ITrackStore
-  state: S
-  actions: A
+  state: IState
+  actions: IActions
 }
 
 interface IStoreApi {
   watch(key: string, callback: Function): any
   deleteWatch(key: string, callback: Function): any
+  [key: string]: any
 }
 
 export { IState, IActions, IStoreArg, ITrackStore, IInstance, IStoreApi }
