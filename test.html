@@ -27,24 +27,23 @@
               age: 20,
             },
           },
-          {
-            name: 'hxl',
-            other: {
-              age: 20,
-            },
-          },
         ]
       },
     },
   })
 
-  // console.log('teachers1', test)
+  console.log('test', test)
+
+  test.watch('info', (value) => {
+    console.log('watch-info', value)
+  })
 
   test.watch('teachers', (value) => {
-    console.log('watch', test)
+    console.log('watch-teachers', value)
   })
 
   setTimeout(() => {
     test.setTeachers()
+    console.log('res', test)
   }, 1000)
 </script>

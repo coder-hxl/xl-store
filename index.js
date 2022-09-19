@@ -1,5 +1,6 @@
 let instanceId = 0
-let inDeepPorxy = false
+let inDeepProxy = false
+let currentRootKey = null
 
 function verifyActions(actions) {
   for (const key in actions) {
@@ -8,6 +9,12 @@ function verifyActions(actions) {
     if (typeof value !== 'function') {
       throw new Error('actions 里只能放函数')
     }
+  }
+}
+
+function verifyState(state) {
+  if (state === null || typeof state !== 'object') {
+    throw new Error('state 必须是对象')
   }
 }
 
@@ -29,10 +36,10 @@ function deleteTrack(trackStore) {
   }
 }
 
-function execute(instance, key) {
+function execute(instance, rootKey) {
   const { trackStore } = instance
-  const value = instance.state[key]
-  const trackSet = trackStore[key]
+  const value = instance.state[rootKey]
+  const trackSet = trackStore[rootKey]
   if (!trackSet) return
 
   for (const item of trackSet) {
@@ -52,60 +59,43 @@ function proxyStore(instance, storeApi) {
       } else if (prop in actions) {
         return actions[prop]
       } else {
-        throw new Error('没有该属性或方法')
+        throw new Error(`没有找到 ${prop}`)
       }
     },
     set(_, prop, value) {
       if (prop in storeApi) {
-        throw new Error('系统方法不允许设置')
+        throw new Error(`${prop} 是系统方法不允许被修改`)
       } else if (prop in state) {
         return (state[prop] = value)
       } else if (prop in actions) {
-        throw new Error('actions, 该方法不允许直接设置')
+        throw new Error(`${prop} 是 actions 的方法, 不允许被修改`)
       } else {
-        throw new Error('请在创建 Store 时添加到 State 或 Actions 中')
+        throw new Error(`${prop} 请在创建 Store 时添加到 State 或 Actions 中`)
       }
     },
   })
 }
 
-let currentRootKey = null
-function proxyState(
-  instance,
-  targetObj,
-  trackStore,
-  isRawState,
-  rootKey = null
-) {
+function proxyState(instance, targetObj, rootKey = null) {
   return new Proxy(targetObj, {
     set(target, prop, value) {
-      if (isRawState) {
-        if (!(prop in target)) return false
-      }
+      if (target[prop] === value) return false
 
-      if (inDeepPorxy) {
+      if (inDeepProxy) {
         return (target[prop] = value)
-      } else if (typeof value === 'object') {
-        currentRootKey = prop
-        inDeepPorxy = true
-        const proxyRes = (target[prop] = proxyState(
-          instance,
-          value,
-          trackStore,
-          false,
-          prop
-        ))
-        recursionProxyObj(instance, proxyRes, trackStore, false)
+      } else if (typeof value === 'object' && value !== null) {
+        currentRootKey = rootKey ? rootKey : prop
+        console.log('set', prop, currentRootKey, value)
+        target[prop] = deepProxyState(instance, value)
         currentRootKey = null
-        inDeepPorxy = false
       } else {
         target[prop] = value
       }
 
-      if (isRawState) {
-        execute(instance, prop)
-      } else {
+      if (rootKey) {
         execute(instance, rootKey)
+      } else {
+        execute(instance, prop)
       }
 
       return true
@@ -113,48 +103,63 @@ function proxyState(
   })
 }
 
-function recursionProxyObj(instance, target, trackStore, isRoot = false) {
-  for (const key in target) {
-    const value = target[key]
-    if (typeof value === 'object' && value !== null) {
+function deepProxyState(instance, rawTarget, isRootObj = false) {
+  let rootContainer = null
+
+  // 设置根容器
+  if (Array.isArray(rawTarget)) {
+    rootContainer = []
+  } else if (typeof rawTarget === 'object') {
+    rootContainer = {}
+  }
+
+  inDeepProxy = true
+
+  function recursionProxy(target, upContainer, isRoot = false) {
+    for (const key in target) {
+      const value = target[key]
       if (isRoot) {
         currentRootKey = key
       }
 
-      const proxyRes = proxyState(
-        instance,
-        value,
-        trackStore,
-        false,
-        currentRootKey
-      )
-      target[key] = proxyRes
+      // 从底层开始进行 proxy
+      /* 
+        1.引用类型
+          1.1. 创建容器, 继续递归下去
+          1.2. 容器填充结束后进行 proxy 代理, 代理结果赋值给上一个容器
 
-      recursionProxyObj(instance, proxyRes, trackStore)
+        2.普通类型
+          直接赋值给上一个容器
+      */
+      if (typeof value === 'object' && value !== null) {
+        let container = {}
+
+        if (Array.isArray(value)) {
+          container = []
+        }
+
+        recursionProxy(value, container)
+        upContainer[key] = proxyState(instance, container, currentRootKey)
+      } else {
+        upContainer[key] = value
+      }
 
       if (isRoot) {
         currentRootKey = null
       }
     }
   }
+
+  recursionProxy(rawTarget, rootContainer, isRootObj)
+
+  inDeepProxy = false
+
+  return isRootObj
+    ? proxyState(instance, rootContainer)
+    : proxyState(instance, rootContainer, currentRootKey)
 }
 
-function deepProxyState(instance, rawState) {
-  const { trackStore } = instance
-
-  const store = (instance.state = proxyState(
-    instance,
-    rawState,
-    trackStore,
-    true
-  ))
-
-  inDeepPorxy = true
-  recursionProxyObj(instance, store, trackStore, true)
-  inDeepPorxy = false
-}
-
-function createStoreInstance(state, actions) {
+function createStoreInstance(rawState, actions) {
   // 创建实例对象
   const instance = {
     id: instanceId++,
@@ -165,7 +170,7 @@ function createStoreInstance(state, actions) {
 
   // 实例对象初始化
   // 给 state 进行代理
-  deepProxyState(instance, state)
+  instance.state = deepProxyState(instance, rawState, true)
 
   return instance
 }
@@ -183,6 +188,8 @@ function createStoreApi(instance) {
 
 export default function xlStore(store) {
   const { state = {}, actions = {} } = store
+
+  verifyState(state)
   verifyActions(actions)
 
   const instance = createStoreInstance(state, actions)
