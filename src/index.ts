@@ -208,7 +208,7 @@ function createStoreApi(instance: IInstance) {
 
 export default function xlStore<S extends IState, A extends IActions>(
   store: IStoreArg<S, A>
-): S & A {
+): S & A & IStoreApi {
   const state = store.state ?? {}
   const actions = store.actions ?? {}
 
@@ -220,5 +220,5 @@ export default function xlStore<S extends IState, A extends IActions>(
 
   const storeProxy = proxyStore(instance, storeApi)
 
-  return storeProxy as unknown as S & A
+  return storeProxy as unknown as S & A & IStoreApi
 }

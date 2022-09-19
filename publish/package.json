@@ -1,0 +1,22 @@
+{
+  "name": "xl-store-tst",
+  "version": "1.0.8",
+  "description": "状态管理仓库",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js"
+    }
+  },
+  "keywords": [
+    "store",
+    "state"
+  ],
+  "author": "coderhxl",
+  "license": "ISC"
+}
