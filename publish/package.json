@@ -1,9 +1,17 @@
 {
-  "name": "xl-store-tst",
-  "version": "1.0.14",
+  "name": "xl-store",
+  "version": "0.0.2",
   "description": "状态管理仓库",
   "main": "lib/index.js",
+  "type": "module",
   "types": "lib/index.d.ts",
+  "author": "coderhxl",
+  "license": "ISC",
+  "homepage": "https://github.com/coder-hxl/xl-store/tree/master/publish",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coder-hxl/xl-store"
+  },
   "scripts": {},
   "exports": {
     ".": "./lib/index.js"
@@ -11,7 +19,5 @@
   "keywords": [
     "store",
     "state"
-  ],
-  "author": "coderhxl",
-  "license": "ISC"
+  ]
 }

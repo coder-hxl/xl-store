@@ -1,15 +1,15 @@
 {
   "name": "xl-store",
-  "version": "1.0.0",
+  "version": "0.0.2",
+  "type": "module",
   "description": "状态管理仓库",
   "scripts": {
-    "build": "node esbuild.js"
+    "build": "node esbuild.js",
+    "test": "ts-node-esm test/test.ts"
   },
   "author": "coderhxl",
   "license": "ISC",
-  "dependencies": {
-    "xl-store-tst": "^1.0.12"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^18.7.18",
     "esbuild": "^0.15.8",

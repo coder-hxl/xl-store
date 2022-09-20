@@ -4,10 +4,10 @@ specifiers:
   '@types/node': ^18.7.18
   esbuild: ^0.15.8
   typescript: ^4.8.3
-  xl-store-tst: ^1.0.12
+  xl-store: 'link:'
 
 dependencies:
-  xl-store-tst: 1.0.12
+  xl-store: 'link:'
 
 devDependencies:
   '@types/node': 18.7.18
@@ -265,7 +265,3 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
-
-  /xl-store-tst/1.0.12:
-    resolution: {integrity: sha512-EyqI9yM1ejRxZ3LkkNlUPkM8md5wF/YcIBsuezciAWtrwuR+IAQTMkG3NzrqV+fcCCfT92sc2+na9jnOH91cdA==}
-    dev: false
