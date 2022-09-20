@@ -1,13 +1,13 @@
-interface IState {
+interface IState extends Object {
   [key: string]: any
 }
 
-interface IActions {
+interface IActions extends Object {
   [key: string]: Function
 }
 
 interface IStoreArg<S, A> {
-  state: S & IState
+  state: IState
   actions: A & IActions & ThisType<S & A & IStoreApi>
 }
 

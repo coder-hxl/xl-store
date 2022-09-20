@@ -5,6 +5,8 @@ import {
   ITrackStore,
   IInstance,
   IStoreApi,
+  IArray,
+  IObject,
 } from "./types"
 
 let instanceId = 0
@@ -61,7 +63,6 @@ function proxyStore(instance: IInstance, storeApi: IStoreApi) {
 
   return new Proxy(instance, {
     get(_, prop: string) {
-
       if (prop in storeApi) {
         return storeApi[prop]
       } else if (prop in state) {
@@ -73,7 +74,6 @@ function proxyStore(instance: IInstance, storeApi: IStoreApi) {
       }
     },
     set(_, prop: string, value) {
-
       if (prop in storeApi) {
         throw new Error(`${prop} 是系统方法不允许被修改`)
       } else if (prop in state) {
@@ -90,7 +90,7 @@ function proxyStore(instance: IInstance, storeApi: IStoreApi) {
 
 function proxyState(
   instance: IInstance,
-  targetObj: any[] | object,
+  targetObj: IArray | IObject,
   rootKey: null | string = null
 ) {
   return new Proxy(targetObj, {
@@ -100,7 +100,7 @@ function proxyState(
       if (inDeepProxy) {
         return (target[prop] = value)
       } else if (typeof value === "object" && value !== null) {
-        currentRootKey = rootKey ? rootKey : (prop as string)
+        currentRootKey = rootKey ? rootKey : prop
         target[prop] = deepProxyState(instance, value)
         currentRootKey = null
       } else {
@@ -110,7 +110,7 @@ function proxyState(
       if (rootKey) {
         execute(instance, rootKey)
       } else {
-        execute(instance, prop as string)
+        execute(instance, prop)
       }
 
       return true
@@ -120,11 +120,12 @@ function proxyState(
 
 function deepProxyState(
   instance: IInstance,
-  rawTarget: any[] | object,
+  rawTarget: IArray | IObject,
   isRootObj = false
 ) {
   // 设置根容器
-  let rootContainer: any[] | object = {}
+  let rootContainer: IArray | IObject = {
+  }
 
   if (Array.isArray(rawTarget)) {
     rootContainer = []
@@ -132,9 +133,10 @@ function deepProxyState(
 
   inDeepProxy = true
 
+
   function recursionProxy(
-    target: any,
-    upContainer: any,
+    target: IObject | IArray,
+    upContainer: IArray | IObject,
     isRoot = false
   ) {
     for (const key in target) {

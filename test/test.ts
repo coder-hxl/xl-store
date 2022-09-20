@@ -1,33 +1,24 @@
-const xlStore = require('../src/index.js')
+import xlStore from "../src/index.js"
 
-const test = xlStore({
+const myStore = xlStore({
   state: {
-    info: {
-      name: "hxl",
-      age: 18,
-    },
-    teachers: [{ name: "why" }, { name: "pink" }],
+    info: {},
   },
   actions: {
-    getName(this: any): any {
-      return this.info.name
-    },
-    setTeachers(): any {
-      test.teachers = []
+    getInfo(id: number, name: string, age: number) {
+      this.info = { id, name, age }
     },
   },
 })
 
-console.log(test)
+function infoCallback(value: any) {
+  console.log("watch-info", value)
+}
 
-test.watch("info", (value: any) => {
-  console.log("info", value)
-})
+myStore.watch("info", infoCallback)
 
-test.watch("teachers", (value: any) => {
-  console.log("teachers1", value)
-})
+myStore.getInfo(1, "hxl", 18)
 
-setTimeout(() => {
-  test.info.name = "code"
-}, 1000)
+myStore.deleteWatch("info", infoCallback)
+
+myStore.getInfo(2, "code", 18)
