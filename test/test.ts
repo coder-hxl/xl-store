@@ -1,6 +1,4 @@
-// const xlStore = require("../src/index.js");
-
-import xlStore from "../src/index"
+const xlStore = require('../src/index.js')
 
 const test = xlStore({
   state: {
@@ -11,10 +9,10 @@ const test = xlStore({
     teachers: [{ name: "why" }, { name: "pink" }],
   },
   actions: {
-    getName() {
+    getName(this: any): any {
       return this.info.name
     },
-    setTeachers() {
+    setTeachers(): any {
       test.teachers = []
     },
   },
@@ -22,14 +20,14 @@ const test = xlStore({
 
 console.log(test)
 
-test.watch("info", (value) => {
+test.watch("info", (value: any) => {
   console.log("info", value)
 })
 
-test.watch("teachers", (value) => {
+test.watch("teachers", (value: any) => {
   console.log("teachers1", value)
 })
 
-// setTimeout(() => {
-//   test.info.name = "code";
-// }, 1000);
+setTimeout(() => {
+  test.info.name = "code"
+}, 1000)

@@ -3,11 +3,16 @@
   "version": "1.0.0",
   "description": "状态管理仓库",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node esbuild.js"
   },
   "author": "coderhxl",
   "license": "ISC",
+  "dependencies": {
+    "xl-store-tst": "^1.0.12"
+  },
   "devDependencies": {
+    "@types/node": "^18.7.18",
+    "esbuild": "^0.15.8",
     "typescript": "^4.8.3"
   }
 }

@@ -77,7 +77,8 @@ function proxyStore(instance: IInstance, storeApi: IStoreApi) {
       if (prop in storeApi) {
         throw new Error(`${prop} 是系统方法不允许被修改`)
       } else if (prop in state) {
-        return (state[prop] = value)
+        state[prop] = value
+        return true
       } else if (prop in actions) {
         throw new Error(`${prop} 是 actions 的方法, 不允许被修改`)
       } else {
