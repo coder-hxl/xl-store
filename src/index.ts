@@ -43,6 +43,8 @@ function track(trackStore: ITrackStore) {
 function deleteTrack(trackStore: ITrackStore) {
   return (key: string, callback: Function) => {
     const trackSet = trackStore[key]
+    if (!trackSet) return
+
     trackSet.delete(callback)
   }
 }
@@ -75,7 +77,7 @@ function proxyStore(instance: IInstance, storeApi: IStoreApi) {
     },
     set(_, prop: string, value) {
       if (prop in storeApi) {
-        throw new Error(`${prop} 是系统方法不允许被修改`)
+        throw new Error(`${prop} 是 Store 自带的方法不允许被修改`)
       } else if (prop in state) {
         state[prop] = value
         return true
@@ -94,11 +96,12 @@ function proxyState(
   rootKey: null | string = null
 ) {
   return new Proxy(targetObj, {
-    set(target: any, prop: string, value) {
+    set(target, prop: string, value) {
       if (target[prop] === value) return false
 
       if (inDeepProxy) {
-        return (target[prop] = value)
+        target[prop] = value
+        return true
       } else if (typeof value === "object" && value !== null) {
         currentRootKey = rootKey ? rootKey : prop
         target[prop] = deepProxyState(instance, value)
@@ -132,7 +135,6 @@ function deepProxyState(
   }
 
   inDeepProxy = true
-
 
   function recursionProxy(
     target: IObject | IArray,

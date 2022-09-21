@@ -1,6 +1,6 @@
 # xl-store
 
-自编写的状态管理仓库, 目前只支持 ESModule
+自编写的状态管理仓库
 
 ## 安装
 
@@ -14,7 +14,7 @@ npm install xl-store
 yarn add xl-store
 ```
 
-使用 PNPM：
+使用 PNPM:
 ```shell
 pnpm add xl-store
 ```
@@ -24,6 +24,7 @@ pnpm add xl-store
 ```JavaScript
 // 1.导入 xlStore
 import xlStore from 'xlStore'
+// const xlStore = require('xlStore')
 
 // 2.使用
 const myStore = xlStore({
