@@ -7,8 +7,8 @@ interface IActions extends Object {
 }
 
 interface IStoreArg<S, A> {
-  state: IState
-  actions: A & IActions & ThisType<S & A & IStoreApi>
+  state?: IState
+  actions?: A & IActions & ThisType<S & A & IStoreApi>
 }
 
 interface IStoreApi {
