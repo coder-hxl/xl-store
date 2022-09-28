@@ -31,22 +31,43 @@ function verifyState(state: IState) {
 }
 
 function track(trackStore: ITrackStore) {
-  return (key: string, callback: Function) => {
+  function addSingleTrack(key: string, callback: Function) {
     let trackSet = trackStore[key]
     if (!trackSet) {
       trackSet = trackStore[key] = new Set()
     }
-
     trackSet.add(callback)
+  }
+
+  return (target: string | string[], callback: Function) => {
+    if (Array.isArray(target)) {
+      for (const item of target) {
+        addSingleTrack(item, callback)
+      }
+    } else {
+      addSingleTrack(target, callback)
+    }
   }
 }
 
+
+
 function deleteTrack(trackStore: ITrackStore) {
-  return (key: string, callback: Function) => {
+  function deleteSingleTrack(key: string, callback: Function) {
     const trackSet = trackStore[key]
     if (!trackSet) return
 
     trackSet.delete(callback)
+  }
+
+  return (target: string | string[], callback: Function) => {
+    if (Array.isArray(target)) {
+      for (const item of target) {
+        deleteSingleTrack(item, callback)
+      }
+    } else {
+      deleteSingleTrack(target, callback)
+    }
   }
 }
 
