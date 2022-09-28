@@ -11,10 +11,14 @@ interface IStoreArg<S, A> {
   actions?: A & IActions & ThisType<S & A & IStoreApi>
 }
 
+interface IStoreOptionsArg {
+  sameValueExecuteWatch?: boolean
+}
+
 interface IStoreApi {
   watch(key: string, callback: Function): any
   deleteWatch(key: string, callback: Function): any
   [key: string]: any
 }
 
-export default function xlStore<S, A>(store: IStoreArg<S, A>): S & A & IStoreApi
+export default function xlStore<S, A>(store: IStoreArg<S, A>, options?: IStoreOptionsArg): S & A & IStoreApi
