@@ -15,7 +15,11 @@ interface IActions extends Object {
 
 interface IStoreArg<S, A> {
   state?: IState
-  actions?: A & IActions & ThisType<S & A & IStoreApi>
+  actions?: A & IActions & ThisType<S & A & IStoreApi>,
+}
+
+interface IStoreOptionsArg {
+  sameValueExecuteWatch?: boolean
 }
 
 type ITrackStore = {
@@ -26,7 +30,8 @@ interface IInstance {
   id: number
   trackStore: ITrackStore
   state: IState
-  actions: IActions
+  actions: IActions,
+  options: IStoreOptionsArg
 }
 
 interface IStoreApi {
@@ -35,4 +40,4 @@ interface IStoreApi {
   [key: string]: any
 }
 
-export { IObject, IArray, IState, IActions, IStoreArg, ITrackStore, IInstance, IStoreApi }
+export { IObject, IArray, IState, IActions, IStoreArg, IStoreOptionsArg, ITrackStore, IInstance, IStoreApi }

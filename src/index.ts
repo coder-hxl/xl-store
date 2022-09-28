@@ -2,6 +2,7 @@ import {
   IState,
   IActions,
   IStoreArg,
+  IStoreOptionsArg,
   ITrackStore,
   IInstance,
   IStoreApi,
@@ -56,7 +57,7 @@ function execute(instance: IInstance, rootKey: string) {
   if (!trackSet) return
 
   for (const item of trackSet) {
-    item(value)
+    item(rootKey, value)
   }
 }
 
@@ -95,9 +96,11 @@ function proxyState(
   targetObj: IArray | IObject,
   rootKey: null | string = null
 ) {
+  const { sameValueExecuteWatch } = instance.options
+
   return new Proxy(targetObj, {
     set(target, prop: string, value) {
-      if (target[prop] === value) return false
+      if (!sameValueExecuteWatch && target[prop] === value) return true
 
       if (inDeepProxy) {
         target[prop] = value
@@ -184,13 +187,14 @@ function deepProxyState(
     : proxyState(instance, rootContainer, currentRootKey)
 }
 
-function createStoreInstance(rawState: IState, actions: IActions) {
+function createStoreInstance(rawState: IState, actions: IActions, options: IStoreOptionsArg) {
   // 创建实例对象
   const instance: IInstance = {
     id: instanceId++,
     trackStore: {},
     state: {},
     actions,
+    options
   }
 
   // 实例对象初始化
@@ -212,7 +216,7 @@ function createStoreApi(instance: IInstance) {
 }
 
 export default function xlStore<S extends IState, A extends IActions>(
-  store: IStoreArg<S, A>
+  store: IStoreArg<S, A>, options: IStoreOptionsArg = {}
 ): S & A & IStoreApi {
   const state = store.state ?? {}
   const actions = store.actions ?? {}
@@ -220,7 +224,7 @@ export default function xlStore<S extends IState, A extends IActions>(
   verifyState(state)
   verifyActions(actions)
 
-  const instance = createStoreInstance(state, actions)
+  const instance = createStoreInstance(state, actions, options)
   const storeApi = createStoreApi(instance)
 
   const storeProxy = proxyStore(instance, storeApi)

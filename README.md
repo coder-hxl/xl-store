@@ -38,10 +38,13 @@ const myStore = xlStore({
       this.info = { id, name, age }
     }
   }
+}, {
+  // 当值相同时也会执行 watch 的回调
+  sameValueExecuteWatch: true 
 })
 
-function infoCallback(value) {
-  console.log('watch-info', value)
+function infoCallback(key, value) {
+  console.log('watch-info', key, value)
 }
 
 // 观察, 当 info 数据发生改变会执行 infoCallback 回调函数
