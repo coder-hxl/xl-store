@@ -24,7 +24,7 @@ function infoCallback(key, value) {
   console.log("watch-info", key, value);
 }
 
-myStore.watch("info", infoCallback);
+myStore.watchEffect("info", infoCallback);
 
 myStore.getInfo(1, "hxl", 18);
 myStore.setId(1);

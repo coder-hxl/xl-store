@@ -30,8 +30,16 @@ function verifyState(state: IState) {
   }
 }
 
-function track(trackStore: ITrackStore) {
+
+
+function track(instance: IInstance, isEffect = false) {
   function addSingleTrack(key: string, callback: Function) {
+    if (isEffect) {
+      const value = instance.state[key]
+      callback(key, value)
+    }
+
+    const trackStore = instance.trackStore
     let trackSet = trackStore[key]
     if (!trackSet) {
       trackSet = trackStore[key] = new Set()
@@ -49,8 +57,6 @@ function track(trackStore: ITrackStore) {
     }
   }
 }
-
-
 
 function deleteTrack(trackStore: ITrackStore) {
   function deleteSingleTrack(key: string, callback: Function) {
@@ -229,7 +235,8 @@ function createStoreApi(instance: IInstance) {
   const { trackStore } = instance
 
   const storeApi = {
-    watch: track(trackStore),
+    watch: track(instance),
+    watchEffect: track(instance, true),
     deleteWatch: deleteTrack(trackStore),
   }
 

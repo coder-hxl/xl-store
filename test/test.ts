@@ -14,7 +14,7 @@ function callback(key: string, value: any) {
 }
 
 
-myStore.watch(["name", "age"], callback)
+myStore.watchEffect(["name", "age"], callback)
 
 myStore.deleteWatch(['name'], callback)
 

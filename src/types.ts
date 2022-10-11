@@ -36,6 +36,7 @@ interface IInstance {
 
 interface IStoreApi {
   watch(key: string | string[], callback: Function): any
+  watchEffect(key: string | string[], callback: Function): any
   deleteWatch(key: string | string[], callback: Function): any
   [key: string]: any
 }
