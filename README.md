@@ -4,17 +4,20 @@
 
 ## 安装
 
-使用 NPM: 
+使用 NPM:
+
 ```shell
 npm install xl-store
 ```
 
 使用 Yarn:
+
 ```shell
 yarn add xl-store
 ```
 
 使用 PNPM:
+
 ```shell
 pnpm add xl-store
 ```
@@ -33,27 +36,28 @@ const myStore = xlStore({
     info: {}
   },
   actions: {
-    // 存放函数
-    getInfo(id, name, age) {
+    // 存放改变state的函数
+    changeInfoAction(id, name, age) {
+      // this指向state
       this.info = { id, name, age }
     }
   }
 }, {
-  // 当值相同时也会执行 watch 的回调
-  sameValueExecuteWatch: true 
+  // 只要state的值被重新赋值, 就会执行收集到的依赖
+  sameValueExecuteWatch: true
 })
 
 function infoCallback(key, value) {
   console.log('watch-info', key, value)
 }
 
-// 观察, 当 info 数据发生改变会执行 infoCallback 回调函数
+// 添加观察(依赖), 当 info 数据发生改变会执行 infoCallback 回调函数
 myStore.watch('info', infoCallback)
 
-myStore.getInfo(1, 'hxl', 18)
+myStore.changeInfoAction(1, 'hxl', 18)
 
-// 删掉观察, 下次 info 数据发生改变不会执行 infoCallback 回调函数
+// 删掉观察(依赖), 下次 info 数据发生改变不会执行 infoCallback 回调函数
 myStore.deleteWatch('info', infoCallback)
 
-myStore.getInfo(2, 'code', 18)
+myStore.changeInfoAction(2, 'code', 18)
 ```
