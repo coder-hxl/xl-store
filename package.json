@@ -1,6 +1,6 @@
 {
   "name": "xl-store",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "状态管理仓库",
   "scripts": {

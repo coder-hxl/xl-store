@@ -43,7 +43,7 @@ const myStore = xlStore({
     }
   }
 }, {
-  // 默认为true, 只要state的值被重新赋值, 就会执行收集到的依赖
+  // 在修改state时, 无论state的值是否于原先的相等, 最终都会执行收集到的依赖
   sameValueExecuteWatch: true
 })
 
