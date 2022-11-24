@@ -1,9 +1,9 @@
-require("esbuild").buildSync({
-  entryPoints: ["./src/index.ts"],
-  target: "ES2015",
+require('esbuild').buildSync({
+  entryPoints: ['./src/index.ts'],
+  target: 'ES2015',
   bundle: true,
-  platform: "neutral",
+  platform: 'neutral',
   minify: true,
-  outdir: "./publish/lib",
-  outExtension: { ".js": ".mjs" },
-});
+  outdir: './publish/lib',
+  outExtension: { '.js': '.mjs' }
+})

@@ -1,18 +1,20 @@
 {
   "name": "xl-store",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
   "description": "状态管理仓库",
   "scripts": {
     "build": "node esbuild.js",
+    "prettier": "prettier --write .",
     "test": "ts-node-esm test/test.ts"
   },
   "author": "coderhxl",
   "license": "ISC",
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^18.7.18",
     "esbuild": "^0.15.8",
-    "typescript": "^4.8.3"
+    "prettier": "^2.8.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3"
   }
 }
