@@ -3,12 +3,13 @@ import {
   IActions,
   IStoreArg,
   IStoreOptionsArg,
-  ITrackStore,
   IInstance,
   IStoreApi,
-  IArray,
-  IObject,
-} from "./types"
+  AnyArray,
+  AnyObject,
+  IStoreProxy,
+  ObjectKey
+} from './types'
 
 let instanceId = 0
 let inDeepProxy = false
@@ -18,24 +19,25 @@ function verifyActions(actions: IActions) {
   for (const key in actions) {
     const value = actions[key]
 
-    if (typeof value !== "function") {
-      throw new Error("actions 里只能放函数")
+    if (typeof value !== 'function') {
+      throw new Error('actions 里只能放函数')
     }
   }
 }
 
 function verifyState(state: IState) {
-  if (state === null || typeof state !== "object") {
-    throw new Error("state 必须是对象")
+  if (state === null || typeof state !== 'object') {
+    throw new Error('state 必须是对象')
   }
 }
 
-
-
-function track(instance: IInstance, isEffect = false) {
-  function addSingleTrack(key: string, callback: Function) {
+function track<S extends IState, A extends IActions>(
+  instance: IInstance<S, A>,
+  isEffect = false
+) {
+  function addSingleTrack(key: ObjectKey<S>, callback: Function) {
     if (isEffect) {
-      const value = instance.state[key]
+      const value = instance.state[key as string]
       callback(key, value)
     }
 
@@ -58,7 +60,9 @@ function track(instance: IInstance, isEffect = false) {
   }
 }
 
-function deleteTrack(trackStore: ITrackStore) {
+function deleteTrack<S extends IState, A extends IActions>({
+  trackStore
+}: IInstance<S, A>) {
   function deleteSingleTrack(key: string, callback: Function) {
     const trackSet = trackStore[key]
     if (!trackSet) return
@@ -77,7 +81,10 @@ function deleteTrack(trackStore: ITrackStore) {
   }
 }
 
-function execute(instance: IInstance, rootKey: string) {
+function execute<S extends IState, A extends IActions>(
+  instance: IInstance<S, A>,
+  rootKey: string
+) {
   const { trackStore } = instance
   const value = instance.state[rootKey]
   const trackSet = trackStore[rootKey]
@@ -88,19 +95,24 @@ function execute(instance: IInstance, rootKey: string) {
   }
 }
 
-function proxyStore(instance: IInstance, storeApi: IStoreApi) {
+function proxyStore<S extends IState, A extends IActions>(
+  instance: IInstance<S, A>,
+  storeApi: IStoreApi<S>
+): IStoreProxy<S, A> {
   const { state, actions } = instance
 
-  return new Proxy(instance, {
-    get(_, prop: string) {
-      if (prop in storeApi) {
-        return storeApi[prop]
+  const proxyStoreRes = new Proxy<IStoreProxy<S, A>>(instance as any, {
+    get(_, prop: any) {
+      if (prop in instance) {
+        return instance[prop as ObjectKey<IInstance<S, A>>]
+      } else if (prop in storeApi) {
+        return storeApi[prop as ObjectKey<IStoreApi<S>>]
       } else if (prop in state) {
         return state[prop]
       } else if (prop in actions) {
         return actions[prop]
       } else {
-        throw new Error(`没有找到 ${prop}`)
+        throw new Error(`不能获取 ${prop}`)
       }
     },
     set(_, prop: string, value) {
@@ -114,25 +126,28 @@ function proxyStore(instance: IInstance, storeApi: IStoreApi) {
       } else {
         throw new Error(`${prop} 请在创建 Store 时添加到 State 或 Actions 中`)
       }
-    },
+    }
   })
+
+  return proxyStoreRes
 }
 
-function proxyState(
-  instance: IInstance,
-  targetObj: IArray | IObject,
+function proxyState<S extends IState, A extends IActions>(
+  instance: IInstance<S, A>,
+  targetObj: AnyArray | AnyObject,
   rootKey: null | string = null
 ) {
-  const { sameValueExecuteWatch } = instance.options
+  const { isDeepWatch } = instance.options
 
   return new Proxy(targetObj, {
     set(target, prop: string, value) {
-      if (!sameValueExecuteWatch && target[prop] === value) return true
+      // 值不变就无需执行收集到的依赖
+      if (target[prop] === value) return true
 
       if (inDeepProxy) {
         target[prop] = value
         return true
-      } else if (typeof value === "object" && value !== null) {
+      } else if (isDeepWatch && typeof value === 'object' && value !== null) {
         currentRootKey = rootKey ? rootKey : prop
         target[prop] = deepProxyState(instance, value)
         currentRootKey = null
@@ -141,34 +156,32 @@ function proxyState(
       }
 
       if (rootKey) {
-        execute(instance, rootKey)
+        execute<S, A>(instance, rootKey)
       } else {
-        execute(instance, prop)
+        execute<S, A>(instance, prop)
       }
 
       return true
-    },
+    }
   })
 }
 
-function deepProxyState(
-  instance: IInstance,
-  rawTarget: IArray | IObject,
+function deepProxyState<S extends IState, A extends IActions>(
+  instance: IInstance<S, A>,
+  rawTarget: AnyArray | AnyObject,
   isRootObj = false
 ) {
+  const { isDeepWatch } = instance.options
   // 设置根容器
-  let rootContainer: IArray | IObject = {
-  }
+  let rootContainer: AnyArray | AnyObject = {}
 
   if (Array.isArray(rawTarget)) {
     rootContainer = []
   }
 
-  inDeepProxy = true
-
   function recursionProxy(
-    target: IObject | IArray,
-    upContainer: IArray | IObject,
+    target: AnyObject | AnyArray,
+    upContainer: AnyArray | AnyObject,
     isRoot = false
   ) {
     for (const key in target) {
@@ -186,7 +199,7 @@ function deepProxyState(
         2.普通类型
           直接赋值给上一个容器
       */
-      if (typeof value === "object" && value !== null) {
+      if (typeof value === 'object' && value !== null) {
         let container = {}
 
         if (Array.isArray(value)) {
@@ -194,7 +207,7 @@ function deepProxyState(
         }
 
         recursionProxy(value, container)
-        upContainer[key] = proxyState(instance, container, currentRootKey)
+        upContainer[key] = proxyState<S, A>(instance, container, currentRootKey)
       } else {
         upContainer[key] = value
       }
@@ -205,18 +218,26 @@ function deepProxyState(
     }
   }
 
-  recursionProxy(rawTarget, rootContainer, isRootObj)
-
-  inDeepProxy = false
+  if (isDeepWatch) {
+    inDeepProxy = true
+    recursionProxy(rawTarget, rootContainer, isRootObj)
+    inDeepProxy = false
+  } else {
+    rootContainer = rawTarget
+  }
 
   return isRootObj
-    ? proxyState(instance, rootContainer)
-    : proxyState(instance, rootContainer, currentRootKey)
+    ? proxyState<S, A>(instance, rootContainer)
+    : proxyState<S, A>(instance, rootContainer, currentRootKey)
 }
 
-function createStoreInstance(rawState: IState, actions: IActions, options: IStoreOptionsArg) {
+function createStoreInstance<S extends IState, A extends IActions>(
+  rawState: S,
+  actions: A,
+  options: IStoreOptionsArg
+) {
   // 创建实例对象
-  const instance: IInstance = {
+  const instance: IInstance<S, A> = {
     id: instanceId++,
     trackStore: {},
     state: {},
@@ -226,36 +247,37 @@ function createStoreInstance(rawState: IState, actions: IActions, options: IStor
 
   // 实例对象初始化
   // 给 state 进行代理
-  instance.state = deepProxyState(instance, rawState, true)
+  instance.state = deepProxyState<S, A>(instance, rawState, true)
 
   return instance
 }
 
-function createStoreApi(instance: IInstance) {
-  const { trackStore } = instance
-
+function createStoreApi<S extends IState, A extends IActions>(
+  instance: IInstance<S, A>
+) {
   const storeApi = {
-    watch: track(instance),
-    watchEffect: track(instance, true),
-    deleteWatch: deleteTrack(trackStore),
+    watch: track<S, A>(instance),
+    watchEffect: track<S, A>(instance, true),
+    deleteWatch: deleteTrack<S, A>(instance)
   }
 
   return storeApi
 }
 
 export default function xlStore<S extends IState, A extends IActions>(
-  store: IStoreArg<S, A>, options: IStoreOptionsArg = {}
-): S & A & IStoreApi {
-  const state = store.state ?? {}
-  const actions = store.actions ?? {}
+  store: IStoreArg<S, A>,
+  options: IStoreOptionsArg = {}
+): IStoreProxy<S, A> {
+  const state = store.state
+  const actions = store.actions
 
   verifyState(state)
   verifyActions(actions)
 
-  const instance = createStoreInstance(state, actions, options)
-  const storeApi = createStoreApi(instance)
+  const instance = createStoreInstance<S, A>(state, actions, options)
+  const storeApi = createStoreApi<S, A>(instance)
 
-  const storeProxy = proxyStore(instance, storeApi)
+  const proxyStoreRes = proxyStore<S, A>(instance, storeApi)
 
-  return storeProxy as unknown as S & A & IStoreApi
+  return proxyStoreRes
 }

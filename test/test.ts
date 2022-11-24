@@ -1,23 +1,50 @@
-import xlStore from "../src/index.js"
+import xlStore from '../src/index.js'
 
-const myStore = xlStore({
-  state: {
-    name: 'hxl',
-    age: 18
+const myStore = xlStore(
+  {
+    state: {
+      userInfo: {
+        name: 'hxl',
+        age: 18
+      },
+      books: [
+        { id: 100, name: 'JS高级程序设计', price: 88 },
+        { id: 101, name: 'Vue高级程序设计', price: 99 },
+        { id: 102, name: 'React高级程序设计', price: 87 }
+      ]
+    },
+    actions: {
+      changeUserInfoAction() {
+        this.userInfo = {
+          name: 'coderhxl',
+          age: 18
+        }
+      },
+      changeBookPriceAction() {
+        this.books[0].price = 99
+      }
+    }
   },
-  actions: {
-  },
-})
+  {
+    isDeepWatch: true
+  }
+)
 
-function callback(key: string, value: any) {
-  console.log("watch", key, value)
+function getUserInfo(key: string, value: any) {
+  console.log('getUserInfo', key, value)
 }
 
+function getBooks(key: string, value: any) {
+  console.log('getBooks', key, value)
+}
 
-myStore.watchEffect(["name", "age"], callback)
+console.log(myStore.userInfo)
+console.log(myStore.books)
 
-myStore.deleteWatch(['name'], callback)
+myStore.watch('userInfo', getUserInfo)
+myStore.watch('books', getBooks)
 
-myStore.name = 'code'
-myStore.age = 19
+console.log('------------------------------')
 
+myStore.changeUserInfoAction()
+myStore.changeBookPriceAction()

@@ -1,44 +1,60 @@
-interface IObject extends Object {
+export interface AnyObject extends Object {
   [key: string]: any
 }
-interface IArray extends Array<any> {
-  [key: string]: any
-}
-
-interface IState extends Object {
+export interface AnyArray extends Array<any> {
   [key: string]: any
 }
 
-interface IActions extends Object {
+/* Store Type */
+export type ObjectKey<T> = keyof T
+
+export interface IState extends Object {
+  [key: string]: any
+}
+
+export interface IActions extends Object {
   [key: string]: Function
 }
 
-interface IStoreArg<S, A> {
-  state?: IState
-  actions?: A & IActions & ThisType<S & A & IStoreApi>,
+export type ITrackStore<S> = {
+  [Props in keyof S]?: Set<Function>
 }
 
-interface IStoreOptionsArg {
-  sameValueExecuteWatch?: boolean
+export interface IStoreApi<S> {
+  watch(
+    key: ObjectKey<S> | ObjectKey<S>[],
+    callback: (key: string, value: any) => any
+  ): any
+  watchEffect(
+    key: ObjectKey<S> | ObjectKey<S>[],
+    callback: (key: string, value: any) => any
+  ): any
+  deleteWatch(
+    key: ObjectKey<S> | ObjectKey<S>[],
+    callback: (key: string, value: any) => any
+  ): any
 }
 
-type ITrackStore = {
-  [key: string]: Set<Function>
-}
-
-interface IInstance {
+export interface IInstance<S extends IState, A extends IActions> {
   id: number
-  trackStore: ITrackStore
+  trackStore: ITrackStore<S>
   state: IState
-  actions: IActions,
+  actions: A & ThisType<IStoreProxy<S, A>>
   options: IStoreOptionsArg
 }
 
-interface IStoreApi {
-  watch(key: string | string[], callback: Function): any
-  watchEffect(key: string | string[], callback: Function): any
-  deleteWatch(key: string | string[], callback: Function): any
-  [key: string]: any
+export interface IStoreArg<S extends IState, A extends IActions> {
+  state: S
+  actions: A & ThisType<IStoreProxy<S, A>>
 }
 
-export { IObject, IArray, IState, IActions, IStoreArg, IStoreOptionsArg, ITrackStore, IInstance, IStoreApi }
+export interface IStoreOptionsArg {
+  isDeepWatch?: boolean
+}
+
+export type IStoreProxy<S extends IState, A extends IActions> = S &
+  A &
+  IStoreApi<S> & {
+    id: number
+    trackStore: ITrackStore<S>
+  }
