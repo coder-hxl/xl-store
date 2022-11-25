@@ -1,10 +1,11 @@
 {
   "name": "xl-store",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "type": "module",
   "description": "状态管理仓库",
   "scripts": {
-    "build": "node ./script/build.js",
+    "build-esm": "node ./script/build.js esm",
+    "build-cjs": "node ./script/build.js cjs",
     "prettier": "prettier --write .",
     "test": "node script/test.js && node test/index.mjs"
   },

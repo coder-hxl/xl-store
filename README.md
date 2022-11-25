@@ -43,8 +43,8 @@ const myStore = xlStore({
     }
   }
 }, {
-  // 在修改state时, 无论state的值是否于原先的相等, 最终都会执行收集到的依赖
-  sameValueExecuteWatch: true
+  // 当 state 内部值发生改变也执行副作用
+  isDeepWatch: true // default: false
 })
 
 function infoCallback(key, value) {
