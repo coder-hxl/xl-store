@@ -1,9 +1,29 @@
 import { track, deleteTrack } from './effect'
-import { deepProxyState } from './proxy'
+import { proxyState, deepProxyState } from './proxy'
 
-import { IState, IActions, IStoreOptionsArg, IInstance } from './types'
+import {
+  IState,
+  IActions,
+  IStoreOptionsArg,
+  IInstance,
+  AnyArray,
+  AnyObject
+} from './types'
 
 let instanceId = 0
+
+function handleState<S extends IState, A extends IActions<S, A>>(
+  instance: IInstance<S, A>,
+  rawTarget: AnyArray | AnyObject
+) {
+  const { isDeepWatch } = instance.options
+
+  if (isDeepWatch) {
+    return deepProxyState(instance, rawTarget, true)
+  } else {
+    return proxyState(instance, rawTarget)
+  }
+}
 
 export function createStoreInstance<S extends IState, A extends IActions<S, A>>(
   rawState: S,
@@ -21,7 +41,7 @@ export function createStoreInstance<S extends IState, A extends IActions<S, A>>(
 
   // 实例对象初始化
   // 给 state 进行代理
-  instance.state = deepProxyState<S, A>(instance, rawState, true)
+  instance.state = handleState<S, A>(instance, rawState)
 
   return instance
 }

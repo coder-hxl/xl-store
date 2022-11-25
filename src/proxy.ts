@@ -11,6 +11,7 @@ import {
   ObjectKey
 } from './types'
 
+// inDeepProxy: 防止在 Proxy 过程中触发副作用函数
 let inDeepProxy = false
 let currentRootKey: null | string = null
 
@@ -21,7 +22,7 @@ export function proxyStore<S extends IState, A extends IActions<S, A>>(
   const { state, actions } = instance
 
   const proxyStoreRes = new Proxy<IStoreProxyRes<S, A>>(instance as any, {
-    get(_, prop: any) {
+    get(_, prop: string) {
       if (prop in instance) {
         return instance[prop as ObjectKey<IInstance<S, A>>]
       } else if (prop in storeApi) {
@@ -34,7 +35,7 @@ export function proxyStore<S extends IState, A extends IActions<S, A>>(
         throw new Error(`不能获取 ${prop}`)
       }
     },
-    set(_, prop: string, value) {
+    set(_, prop: string, value: any) {
       if (prop in storeApi) {
         throw new Error(`${prop} 是 Store 自带的方法不允许被修改`)
       } else if (prop in state) {
@@ -63,22 +64,18 @@ export function proxyState<S extends IState, A extends IActions<S, A>>(
       // 值不变就无需执行收集到的依赖
       if (target[prop] === value) return true
 
-      if (inDeepProxy) {
+      if (!isDeepWatch) {
+        target[prop] = value
+      } else if (isDeepWatch && inDeepProxy) {
         target[prop] = value
         return true
       } else if (isDeepWatch && typeof value === 'object' && value !== null) {
-        currentRootKey = rootKey ? rootKey : prop
+        currentRootKey = rootKey ?? prop
         target[prop] = deepProxyState(instance, value)
         currentRootKey = null
-      } else {
-        target[prop] = value
       }
 
-      if (rootKey) {
-        execute<S, A>(instance, rootKey)
-      } else {
-        execute<S, A>(instance, prop)
-      }
+      execute<S, A>(instance, rootKey ?? prop)
 
       return true
     }
@@ -90,13 +87,8 @@ export function deepProxyState<S extends IState, A extends IActions<S, A>>(
   rawTarget: AnyArray | AnyObject,
   isRootObj = false
 ) {
-  const { isDeepWatch } = instance.options
   // 设置根容器
-  let rootContainer: AnyArray | AnyObject = {}
-
-  if (Array.isArray(rawTarget)) {
-    rootContainer = []
-  }
+  const rootContainer: AnyArray | AnyObject = Array.isArray(rawTarget) ? [] : {}
 
   function recursionProxy(
     target: AnyObject | AnyArray,
@@ -119,11 +111,7 @@ export function deepProxyState<S extends IState, A extends IActions<S, A>>(
           直接赋值给上一个容器
       */
       if (typeof value === 'object' && value !== null) {
-        let container = {}
-
-        if (Array.isArray(value)) {
-          container = []
-        }
+        const container = Array.isArray(value) ? [] : {}
 
         recursionProxy(value, container)
         upContainer[key] = proxyState<S, A>(instance, container, currentRootKey)
@@ -137,15 +125,13 @@ export function deepProxyState<S extends IState, A extends IActions<S, A>>(
     }
   }
 
-  if (isDeepWatch) {
-    inDeepProxy = true
-    recursionProxy(rawTarget, rootContainer, isRootObj)
-    inDeepProxy = false
-  } else {
-    rootContainer = rawTarget
-  }
+  inDeepProxy = true
+  recursionProxy(rawTarget, rootContainer, isRootObj)
+  inDeepProxy = false
 
-  return isRootObj
-    ? proxyState<S, A>(instance, rootContainer)
-    : proxyState<S, A>(instance, rootContainer, currentRootKey)
+  return proxyState<S, A>(
+    instance,
+    rootContainer,
+    isRootObj ? null : currentRootKey
+  )
 }

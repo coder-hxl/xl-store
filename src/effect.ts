@@ -59,7 +59,7 @@ export function execute<S extends IState, A extends IActions<S, A>>(
   const trackSet = trackStore[rootKey]
   if (!trackSet) return
 
-  for (const item of trackSet) {
-    item(rootKey, value)
+  for (const effect of trackSet) {
+    effect(rootKey, value)
   }
 }
