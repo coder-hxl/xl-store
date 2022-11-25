@@ -1,25 +1,57 @@
-interface IState extends Object {
+export type ObjectKey<T> = keyof T
+
+export interface IState extends Object {
   [key: string]: any
 }
 
-interface IActions extends Object {
-  [key: string]: Function
+export interface IActions<S extends IState, A extends IActions<S, A>> {
+  [key: string]: (this: IStoreProxyRes<S, A>) => any
 }
 
-interface IStoreArg<S, A> {
-  state?: IState
-  actions?: A & IActions & ThisType<S & A & IStoreApi>
+export type ITrackStore<S> = {
+  [Props in keyof S]?: Set<Function>
 }
 
-interface IStoreOptionsArg {
-  sameValueExecuteWatch?: boolean
+export interface IStoreApi<S> {
+  watch(
+    key: ObjectKey<S> | ObjectKey<S>[],
+    callback: (key: string, value: any) => any
+  ): any
+  watchEffect(
+    key: ObjectKey<S> | ObjectKey<S>[],
+    callback: (key: string, value: any) => any
+  ): any
+  deleteWatch(
+    key: ObjectKey<S> | ObjectKey<S>[],
+    callback: (key: string, value: any) => any
+  ): any
 }
 
-interface IStoreApi {
-  watch(key: string | string[], callback: Function): any
-  deleteWatch(key: string | string[], callback: Function): any
-  watchEffect(key: string | string[], callback: Function): any
-  [key: string]: any
+export interface IInstance<S extends IState, A extends IActions<S, A>> {
+  id: number
+  trackStore: ITrackStore<S>
+  state: IState
+  actions: A
+  options: IStoreOptionsArg
 }
 
-export default function xlStore<S, A>(store: IStoreArg<S, A>, options?: IStoreOptionsArg): S & A & IStoreApi
+export interface IStoreArg<S extends IState, A extends IActions<S, A>> {
+  state?: S
+  actions?: A
+}
+
+export interface IStoreOptionsArg {
+  isDeepWatch?: boolean
+}
+
+export type IStoreProxyRes<S extends IState, A extends IActions<S, A>> = S &
+  A &
+  IStoreApi<S> & {
+    id: number
+    trackStore: ITrackStore<S>
+  }
+
+export default  function xlStore<S extends IState, A extends IActions<S, A>>(
+  store: IStoreArg<S, A>,
+  options?: IStoreOptionsArg
+): IStoreProxyRes<S, A>
