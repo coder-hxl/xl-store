@@ -6,6 +6,5 @@ esbuild.buildSync({
   bundle: true,
   platform: 'neutral',
   minify: true,
-  outdir: './test',
-  outExtension: { '.js': '.mjs' }
+  outdir: './test'
 })

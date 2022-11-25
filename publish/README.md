@@ -43,7 +43,7 @@ const myStore = xlStore({
     }
   }
 }, {
-  // 当 state 内部值发生改变也执行副作用
+  // 当 state 内部值发生改变也执行收集的依赖
   isDeepWatch: true // default: false
 })
 
@@ -53,6 +53,8 @@ function infoCallback(key, value) {
 
 // 添加观察(依赖), 当 info 数据发生改变会执行 infoCallback 回调函数
 myStore.watch('info', infoCallback)
+// 添加观察(依赖), 会先执行一次 infoCallback , 数据发生改变会执行 infoCallback 回调函数
+myStore.watchEffect('info', infoCallback)
 
 myStore.changeInfoAction(1, 'hxl', 18)
 

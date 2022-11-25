@@ -3,13 +3,19 @@ import esbuild from 'esbuild'
 // const process = require('process')
 // const esbuild = require('esbuild')
 
+const args = process.argv.slice(2)
 let platform = 'neutral'
 let outExtension = { '.js': '.mjs' }
 
-if (process.argv[2] !== 'esm') {
+if (args[0] !== 'esm') {
   platform = 'node'
   outExtension = {}
 }
+
+console.log({
+  platform,
+  outExtension
+})
 
 esbuild.buildSync({
   entryPoints: ['./src/index.ts'],

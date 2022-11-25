@@ -1,6 +1,6 @@
 {
   "name": "xl-store",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "状态管理仓库",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

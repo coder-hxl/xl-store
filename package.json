@@ -1,13 +1,13 @@
 {
   "name": "xl-store",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "module",
   "description": "状态管理仓库",
   "scripts": {
     "build-esm": "node ./script/build.js esm",
     "build-cjs": "node ./script/build.js cjs",
     "prettier": "prettier --write .",
-    "test": "node script/test.js && node test/index.mjs"
+    "test": "node script/test.js && node test/index.js"
   },
   "author": "coderhxl",
   "license": "ISC",
