@@ -12,8 +12,8 @@ export interface IState extends Object {
   [key: string]: any
 }
 
-export interface IActions extends Object {
-  [key: string]: Function
+export type IActions<S extends IState, A extends IActions<S, A>> = {
+  [key: string]: (this: IStoreProxy<S, A>) => void
 }
 
 export type ITrackStore<S> = {
@@ -35,7 +35,7 @@ export interface IStoreApi<S> {
   ): any
 }
 
-export interface IInstance<S extends IState, A extends IActions> {
+export interface IInstance<S extends IState, A extends IActions<S, A>> {
   id: number
   trackStore: ITrackStore<S>
   state: IState
@@ -43,7 +43,7 @@ export interface IInstance<S extends IState, A extends IActions> {
   options: IStoreOptionsArg
 }
 
-export interface IStoreArg<S extends IState, A extends IActions> {
+export interface IStoreArg<S extends IState, A extends IActions<S, A>> {
   state: S
   actions: A & ThisType<IStoreProxy<S, A>>
 }
@@ -52,7 +52,7 @@ export interface IStoreOptionsArg {
   isDeepWatch?: boolean
 }
 
-export type IStoreProxy<S extends IState, A extends IActions> = S &
+export type IStoreProxy<S extends IState, A extends IActions<S, A>> = S &
   A &
   IStoreApi<S> & {
     id: number

@@ -15,7 +15,9 @@ let instanceId = 0
 let inDeepProxy = false
 let currentRootKey: null | string = null
 
-function verifyActions(actions: IActions) {
+function verifyActions<S extends IState, A extends IActions<S, A>>(
+  actions: IActions<S, A>
+) {
   for (const key in actions) {
     const value = actions[key]
 
@@ -31,7 +33,7 @@ function verifyState(state: IState) {
   }
 }
 
-function track<S extends IState, A extends IActions>(
+function track<S extends IState, A extends IActions<S, A>>(
   instance: IInstance<S, A>,
   isEffect = false
 ) {
@@ -60,7 +62,7 @@ function track<S extends IState, A extends IActions>(
   }
 }
 
-function deleteTrack<S extends IState, A extends IActions>({
+function deleteTrack<S extends IState, A extends IActions<S, A>>({
   trackStore
 }: IInstance<S, A>) {
   function deleteSingleTrack(key: string, callback: Function) {
@@ -81,7 +83,7 @@ function deleteTrack<S extends IState, A extends IActions>({
   }
 }
 
-function execute<S extends IState, A extends IActions>(
+function execute<S extends IState, A extends IActions<S, A>>(
   instance: IInstance<S, A>,
   rootKey: string
 ) {
@@ -95,7 +97,7 @@ function execute<S extends IState, A extends IActions>(
   }
 }
 
-function proxyStore<S extends IState, A extends IActions>(
+function proxyStore<S extends IState, A extends IActions<S, A>>(
   instance: IInstance<S, A>,
   storeApi: IStoreApi<S>
 ): IStoreProxy<S, A> {
@@ -132,7 +134,7 @@ function proxyStore<S extends IState, A extends IActions>(
   return proxyStoreRes
 }
 
-function proxyState<S extends IState, A extends IActions>(
+function proxyState<S extends IState, A extends IActions<S, A>>(
   instance: IInstance<S, A>,
   targetObj: AnyArray | AnyObject,
   rootKey: null | string = null
@@ -166,7 +168,7 @@ function proxyState<S extends IState, A extends IActions>(
   })
 }
 
-function deepProxyState<S extends IState, A extends IActions>(
+function deepProxyState<S extends IState, A extends IActions<S, A>>(
   instance: IInstance<S, A>,
   rawTarget: AnyArray | AnyObject,
   isRootObj = false
@@ -231,7 +233,7 @@ function deepProxyState<S extends IState, A extends IActions>(
     : proxyState<S, A>(instance, rootContainer, currentRootKey)
 }
 
-function createStoreInstance<S extends IState, A extends IActions>(
+function createStoreInstance<S extends IState, A extends IActions<S, A>>(
   rawState: S,
   actions: A,
   options: IStoreOptionsArg
@@ -252,7 +254,7 @@ function createStoreInstance<S extends IState, A extends IActions>(
   return instance
 }
 
-function createStoreApi<S extends IState, A extends IActions>(
+function createStoreApi<S extends IState, A extends IActions<S, A>>(
   instance: IInstance<S, A>
 ) {
   const storeApi = {
@@ -264,7 +266,7 @@ function createStoreApi<S extends IState, A extends IActions>(
   return storeApi
 }
 
-export default function xlStore<S extends IState, A extends IActions>(
+export default function xlStore<S extends IState, A extends IActions<S, A>>(
   store: IStoreArg<S, A>,
   options: IStoreOptionsArg = {}
 ): IStoreProxy<S, A> {
@@ -272,7 +274,7 @@ export default function xlStore<S extends IState, A extends IActions>(
   const actions = store.actions
 
   verifyState(state)
-  verifyActions(actions)
+  verifyActions<S, A>(actions)
 
   const instance = createStoreInstance<S, A>(state, actions, options)
   const storeApi = createStoreApi<S, A>(instance)
