@@ -14,8 +14,8 @@ export default function xlStore<S extends IState, A extends IActions<S, A>>(
   store: IStoreArg<S, A>,
   options: IStoreOptionsArg = {}
 ): IStoreProxyRes<S, A> {
-  const state = store.state
-  const actions = store.actions
+  const state = store.state ?? ({} as S)
+  const actions = store.actions ?? ({} as A)
 
   verifyState(state)
   verifyActions<S, A>(actions)

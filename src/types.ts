@@ -44,8 +44,8 @@ export interface IInstance<S extends IState, A extends IActions<S, A>> {
 }
 
 export interface IStoreArg<S extends IState, A extends IActions<S, A>> {
-  state: S
-  actions: A
+  state?: S
+  actions?: A
 }
 
 export interface IStoreOptionsArg {
