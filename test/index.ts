@@ -1,4 +1,4 @@
-import xlStore from '../src/index.js'
+import xlStore from '../src/index'
 
 const myStore = xlStore(
   {
