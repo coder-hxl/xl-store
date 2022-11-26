@@ -1,7 +1,5 @@
-import process from 'process'
-import esbuild from 'esbuild'
-// const process = require('process')
-// const esbuild = require('esbuild')
+const process = require('process')
+const esbuild = require('esbuild')
 
 const args = process.argv.slice(2)
 let platform = 'neutral'
