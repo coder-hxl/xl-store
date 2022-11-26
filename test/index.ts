@@ -14,14 +14,11 @@ const myStore = xlStore(
       ]
     },
     actions: {
-      changeUserInfoAction() {
-        this.userInfo = {
-          name: 'coderhxl',
-          age: 18
-        }
+      changeUserInfoAction(newInfo: { name: string; age: number }) {
+        this.userInfo = newInfo
       },
-      changeBookPriceAction() {
-        this.books[0].price = 99
+      changeBookPriceAction(index: number, price: number) {
+        this.books[index].price = price
       }
     }
   },
@@ -38,13 +35,11 @@ function getBooks(key: string, value: any) {
   console.log('getBooks', key, value)
 }
 
-console.log(myStore.userInfo)
-console.log(myStore.books)
-
-myStore.watch('userInfo', getUserInfo)
-myStore.watch('books', getBooks)
+myStore.watchEffect('userInfo', getUserInfo)
+myStore.watchEffect('books', getBooks)
 
 console.log('------------------------------')
 
-myStore.changeUserInfoAction()
-myStore.changeBookPriceAction()
+myStore.changeUserInfoAction({ name: 'coderhxl', age: 18 })
+myStore.changeBookPriceAction(0, 66)
+

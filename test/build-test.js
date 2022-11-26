@@ -1,5 +1,5 @@
-import xlStore from '../publish/lib/index.mjs'
-// const xlStore = require('../publish/lib/index')
+// import xlStore from '../publish/lib/index.mjs'
+const xlStore = require('../publish/lib/index')
 
 const myStore = xlStore(
   {
@@ -21,8 +21,8 @@ const myStore = xlStore(
           age: 18
         }
       },
-      changeBookPriceAction() {
-        this.books[0].price = 99
+      changeBookPriceAction(index, price) {
+        this.books[index].price = price
       }
     }
   },
@@ -48,4 +48,4 @@ myStore.watch('books', getBooks)
 console.log('------------------------------')
 
 myStore.changeUserInfoAction()
-myStore.changeBookPriceAction()
+myStore.changeBookPriceAction(0, 66)
