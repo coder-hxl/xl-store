@@ -22,6 +22,14 @@ yarn add xl-store
 pnpm add xl-store
 ```
 
+## API
+
+### watch
+
+### watchEffect
+
+### deleteWatch
+
 ## 使用
 
 ```JavaScript
