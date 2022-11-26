@@ -7,7 +7,7 @@ import {
   IStoreApi,
   AnyArray,
   AnyObject,
-  IStoreProxyRes,
+  IProxyInstanceRes,
   ObjectKey
 } from './types'
 
@@ -15,13 +15,13 @@ import {
 let inDeepProxy = false
 let currentRootKey: null | string = null
 
-export function proxyStore<S extends IState, A extends IActions<S, A>>(
-  instance: IInstance<S, A>,
-  storeApi: IStoreApi<S>
-): IStoreProxyRes<S, A> {
-  const { state, actions } = instance
+export function proxyInstance<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>(instance: IInstance<S, A>): IProxyInstanceRes<S, A> {
+  const { state, actions, storeApi } = instance
 
-  const proxyStoreRes = new Proxy<IStoreProxyRes<S, A>>(instance as any, {
+  return new Proxy<IProxyInstanceRes<S, A>>(instance as any, {
     get(_, prop: string) {
       if (prop in instance) {
         return instance[prop as ObjectKey<IInstance<S, A>>]
@@ -36,23 +36,24 @@ export function proxyStore<S extends IState, A extends IActions<S, A>>(
       }
     },
     set(_, prop: string, value: any) {
-      if (prop in storeApi) {
-        throw new Error(`${prop} 是 Store 自带的方法不允许被修改`)
+      if (prop in instance || prop in storeApi) {
+        throw new Error(`${prop} 是 Store 自带的不允许被修改`)
       } else if (prop in state) {
-        state[prop] = value
+        state[prop as ObjectKey<S | IState>] = value
         return true
       } else if (prop in actions) {
-        throw new Error(`${prop} 是 actions 的方法, 不允许被修改`)
+        throw new Error(`${prop} 是 actions , 不允许被修改`)
       } else {
-        throw new Error(`${prop} 请在创建 Store 时添加到 State 或 Actions 中`)
+        throw new Error(`${prop} 不允许被修改或添加`)
       }
     }
   })
-
-  return proxyStoreRes
 }
 
-export function proxyState<S extends IState, A extends IActions<S, A>>(
+export function proxyState<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>(
   instance: IInstance<S, A>,
   targetObj: AnyArray | AnyObject,
   rootKey: null | string = null
@@ -64,15 +65,19 @@ export function proxyState<S extends IState, A extends IActions<S, A>>(
       // 值不变就无需执行收集到的依赖
       if (target[prop] === value) return true
 
-      if (!isDeepWatch) {
+      if (isDeepWatch) {
+        if (inDeepProxy) {
+          target[prop] = value
+          return true
+        } else if (typeof value === 'object' && value !== null) {
+          currentRootKey = rootKey ?? prop
+          target[prop] = deepProxyState(instance, value)
+          currentRootKey = null
+        } else {
+          target[prop] = value
+        }
+      } else {
         target[prop] = value
-      } else if (isDeepWatch && inDeepProxy) {
-        target[prop] = value
-        return true
-      } else if (isDeepWatch && typeof value === 'object' && value !== null) {
-        currentRootKey = rootKey ?? prop
-        target[prop] = deepProxyState(instance, value)
-        currentRootKey = null
       }
 
       execute<S, A>(instance, rootKey ?? prop)
@@ -82,7 +87,10 @@ export function proxyState<S extends IState, A extends IActions<S, A>>(
   })
 }
 
-export function deepProxyState<S extends IState, A extends IActions<S, A>>(
+export function deepProxyState<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>(
   instance: IInstance<S, A>,
   rawTarget: AnyArray | AnyObject,
   isRootObj = false

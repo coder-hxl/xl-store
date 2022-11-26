@@ -1,9 +1,15 @@
-import { IState, IActions, IInstance, ObjectKey } from './types'
+import {
+  IState,
+  IActions,
+  IInstance,
+  ObjectKey,
+  IProxyInstanceRes
+} from './types'
 
-export function track<S extends IState, A extends IActions<S, A>>(
-  instance: IInstance<S, A>,
-  isEffect = false
-) {
+export function track<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>(instance: IInstance<S, A>, isEffect = false) {
   function addSingleTrack(key: ObjectKey<S>, callback: Function) {
     if (isEffect) {
       const value = instance.state[key as string]
@@ -29,9 +35,10 @@ export function track<S extends IState, A extends IActions<S, A>>(
   }
 }
 
-export function deleteTrack<S extends IState, A extends IActions<S, A>>({
-  trackStore
-}: IInstance<S, A>) {
+export function deleteTrack<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>({ trackStore }: IInstance<S, A>) {
   function deleteSingleTrack(key: string, callback: Function) {
     const trackSet = trackStore[key]
     if (!trackSet) return
@@ -50,10 +57,10 @@ export function deleteTrack<S extends IState, A extends IActions<S, A>>({
   }
 }
 
-export function execute<S extends IState, A extends IActions<S, A>>(
-  instance: IInstance<S, A>,
-  rootKey: string
-) {
+export function execute<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>(instance: IInstance<S, A>, rootKey: string) {
   const { trackStore } = instance
   const value = instance.state[rootKey]
   const trackSet = trackStore[rootKey]

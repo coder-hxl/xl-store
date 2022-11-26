@@ -12,8 +12,8 @@ export interface IState extends Object {
   [key: string]: any
 }
 
-export interface IActions<S extends IState, A extends IActions<S, A>> {
-  [key: string]: (this: IStoreProxyRes<S, A>) => any
+export interface IActions<T> {
+  [key: string]: (this: T, ...args: any) => void
 }
 
 export type ITrackStore<S> = {
@@ -35,15 +35,22 @@ export interface IStoreApi<S> {
   ): any
 }
 
-export interface IInstance<S extends IState, A extends IActions<S, A>> {
+export interface IInstance<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+> {
   id: number
   trackStore: ITrackStore<S>
-  state: IState
-  actions: A
+  storeApi: IStoreApi<S> | AnyObject
+  state: S | IState
+  actions: A | IActions<IProxyInstanceRes<S, A>>
   options: IStoreOptionsArg
 }
 
-export interface IStoreArg<S extends IState, A extends IActions<S, A>> {
+export interface IStoreArgs<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+> {
   state?: S
   actions?: A
 }
@@ -52,7 +59,10 @@ export interface IStoreOptionsArg {
   isDeepWatch?: boolean
 }
 
-export type IStoreProxyRes<S extends IState, A extends IActions<S, A>> = S &
+export type IProxyInstanceRes<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+> = S &
   A &
   IStoreApi<S> & {
     id: number

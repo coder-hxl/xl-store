@@ -1,29 +1,27 @@
-import { createStoreInstance, createStoreApi } from './create'
-import { proxyStore } from './proxy'
-import { verifyState, verifyActions } from './verify'
+import { verifyStoreArgs } from './verify'
+import { createInstance } from './initialize'
+import { proxyInstance } from './proxy'
 
 import {
   IState,
   IActions,
-  IStoreArg,
+  IStoreArgs,
   IStoreOptionsArg,
-  IStoreProxyRes
+  IProxyInstanceRes
 } from './types'
 
-export default function xlStore<S extends IState, A extends IActions<S, A>>(
-  store: IStoreArg<S, A>,
-  options: IStoreOptionsArg = {}
-): IStoreProxyRes<S, A> {
-  const state = store.state ?? ({} as S)
-  const actions = store.actions ?? ({} as A)
+export default function xlStore<
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>(
+  storeArgs: IStoreArgs<S, A>,
+  options?: IStoreOptionsArg
+): IProxyInstanceRes<S, A> {
+  verifyStoreArgs<S, A>(storeArgs)
 
-  verifyState(state)
-  verifyActions<S, A>(actions)
+  const instance = createInstance<S, A>(storeArgs, options)
 
-  const instance = createStoreInstance<S, A>(state, actions, options)
-  const storeApi = createStoreApi<S, A>(instance)
+  const proxyInstanceRes = proxyInstance<S, A>(instance)
 
-  const proxyStoreRes = proxyStore<S, A>(instance, storeApi)
-
-  return proxyStoreRes
+  return proxyInstanceRes
 }
