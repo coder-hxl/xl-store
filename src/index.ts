@@ -10,10 +10,7 @@ import {
   IProxyInstanceRes
 } from './types'
 
-export default function xlStore<
-  S extends IState,
-  A extends IActions<IProxyInstanceRes<S, A>>
->(
+function xlStore<S extends IState, A extends IActions<IProxyInstanceRes<S, A>>>(
   storeArgs: IStoreArgs<S, A>,
   options?: IStoreOptionsArg
 ): IProxyInstanceRes<S, A> {
@@ -25,3 +22,5 @@ export default function xlStore<
 
   return proxyInstanceRes
 }
+
+module.exports = xlStore

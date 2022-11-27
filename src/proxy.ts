@@ -22,27 +22,27 @@ export function proxyInstance<
   const { state, actions, storeApi } = instance
 
   return new Proxy<IProxyInstanceRes<S, A>>(instance as any, {
+    // storeApi => state => actions
+
     get(_, prop: string) {
-      if (prop in instance) {
-        return instance[prop as ObjectKey<IInstance<S, A>>]
-      } else if (prop in storeApi) {
+      if (prop in storeApi) {
         return storeApi[prop as ObjectKey<IStoreApi<S>>]
       } else if (prop in state) {
         return state[prop]
       } else if (prop in actions) {
         return actions[prop]
       } else {
-        throw new Error(`不能获取 ${prop}`)
+        return undefined
       }
     },
     set(_, prop: string, value: any) {
-      if (prop in instance || prop in storeApi) {
+      if (prop in storeApi) {
         throw new Error(`${prop} 是 Store 自带的不允许被修改`)
       } else if (prop in state) {
         state[prop as ObjectKey<S | IState>] = value
         return true
       } else if (prop in actions) {
-        throw new Error(`${prop} 是 actions , 不允许被修改`)
+        throw new Error(`${prop} 是 actions , 不允许在此被修改`)
       } else {
         throw new Error(`${prop} 不允许被修改或添加`)
       }
