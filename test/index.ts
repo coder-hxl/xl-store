@@ -1,24 +1,26 @@
 import xlStore from '../src/index'
 
+interface IUserInfo {
+  name: string
+  age: number
+}
+
 const myStore = xlStore(
   {
     state: {
+      count: 0,
       userInfo: {
         name: 'hxl',
         age: 18
-      },
-      books: [
-        { id: 100, name: 'JS高级程序设计', price: 88 },
-        { id: 101, name: 'Vue高级程序设计', price: 99 },
-        { id: 102, name: 'React高级程序设计', price: 87 }
-      ]
+      }
     },
     actions: {
-      changeUserInfoAction(newInfo: { name: string; age: number }) {
-        this.userInfo = newInfo
+      incrementAction() {
+        this.count += 1
       },
-      changeBookPriceAction(index: number, price: number) {
-        this.books[index].price = price
+      changeUserInfoAction(newUserInfo: IUserInfo) {
+        this.userInfo.name = newUserInfo.name
+        // this.userInfo = newUserInfo
       }
     }
   },
@@ -27,19 +29,20 @@ const myStore = xlStore(
   }
 )
 
-function getUserInfo(key: string, value: any) {
+function getCount(key: string, value: number) {
+  console.log('getCount', key, value)
+}
+
+function getUserInfo(key: string, value: IUserInfo) {
   console.log('getUserInfo', key, value)
 }
 
-function getBooks(key: string, value: any) {
-  console.log('getBooks', key, value)
-}
-
+myStore.watchEffect('count', getCount)
 myStore.watchEffect('userInfo', getUserInfo)
-myStore.watchEffect('books', getBooks)
 
 console.log('------------------------------')
 
-myStore.changeUserInfoAction({ name: 'coderhxl', age: 18 })
-myStore.changeBookPriceAction(0, 66)
+myStore.incrementAction()
+myStore.incrementAction()
 
+myStore.changeUserInfoAction({ name: 'coderhxl', age: 18 })

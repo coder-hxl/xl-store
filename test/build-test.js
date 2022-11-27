@@ -4,25 +4,18 @@ const xlStore = require('../publish/lib/index')
 const myStore = xlStore(
   {
     state: {
+      count: 0,
       userInfo: {
         name: 'hxl',
         age: 18
-      },
-      books: [
-        { id: 100, name: 'JS高级程序设计', price: 88 },
-        { id: 101, name: 'Vue高级程序设计', price: 99 },
-        { id: 102, name: 'React高级程序设计', price: 87 }
-      ]
+      }
     },
     actions: {
-      changeUserInfoAction() {
-        this.userInfo = {
-          name: 'coderhxl',
-          age: 18
-        }
+      incrementAction() {
+        this.count += 1
       },
-      changeBookPriceAction(index, price) {
-        this.books[index].price = price
+      changeUserInfoAction(newUserInfo) {
+        this.userInfo = newUserInfo
       }
     }
   },
@@ -31,21 +24,19 @@ const myStore = xlStore(
   }
 )
 
+function getCount(key, value) {
+  console.log('getCount', key, value)
+}
+
 function getUserInfo(key, value) {
   console.log('getUserInfo', key, value)
 }
 
-function getBooks(key, value) {
-  console.log('getBooks', key, value)
-}
-
-console.log(myStore.userInfo)
-console.log(myStore.books)
-
-myStore.watch('userInfo', getUserInfo)
-myStore.watch('books', getBooks)
+myStore.watchEffect('count', getCount)
+myStore.watchEffect('userInfo', getUserInfo)
 
 console.log('------------------------------')
 
-myStore.changeUserInfoAction()
-myStore.changeBookPriceAction(0, 66)
+myStore.incrementAction()
+myStore.incrementAction()
+myStore.changeUserInfoAction({ name: 'coderhxl', age: 18 })

@@ -1,6 +1,6 @@
 {
   "name": "xl-store",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "状态管理仓库",
   "scripts": {
     "build-esm": "node ./script/build.js esm",
@@ -12,7 +12,7 @@
   "author": "coderhxl",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^18.7.18",
+    "@types/node": "^18.11.9",
     "esbuild": "^0.15.8",
     "prettier": "^2.8.0",
     "typescript": "^4.9.3"

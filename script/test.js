@@ -6,7 +6,10 @@ require('esbuild')
     platform: 'neutral',
     minify: true,
     outdir: './test',
-    watch: true
+    watch: true,
+    loader: {
+      '.ts': 'ts'
+    }
   })
   .then((res) => {
     console.log('watching...')
