@@ -1,6 +1,6 @@
 # xl-store
 
-自编写的状态管理仓库
+状态管理库
 
 ## 安装
 
@@ -22,13 +22,49 @@ yarn add xl-store
 pnpm add xl-store
 ```
 
-## API
+## 核心概念
 
-### watch
+### Arguments
 
-### watchEffect
+#### State
 
-### deleteWatch
+存放需要 管理/共享 的数据。
+
+#### Actions
+
+存放改变 State 数据的函数, 可通过 this 拿到 State 中存放的数据。
+
+#### Options
+
+- isDeepWatch: Boolean
+
+  默认为 false ，当 State 中的内部值发生改变也执行收集的依赖（传给 watch 的回调函数）。
+
+### API
+
+#### watch
+
+- Key: String
+
+- Callback: Function
+
+对 State 中某个数据开启监听，当数据发生改变时会执行 Callback ，并将 Key 和 NewValue 当作参数传给 Callback 。
+
+#### watchEffect
+
+- Key: String
+
+- Callback: Function
+
+与 Watch API 一样，不同的是，其会先立刻执行一次 Callback 。
+
+#### deleteWatch
+
+- Key: String
+
+- Callback: Function
+
+删除对 State 中某个数据监听 。
 
 ## 使用
 
@@ -52,7 +88,7 @@ const myStore = xlStore({
   }
 }, {
   // 当 state 内部值发生改变也执行收集的依赖
-  isDeepWatch: true // default: false
+  isDeepWatch: true
 })
 
 function infoCallback(key, value) {
@@ -69,5 +105,5 @@ myStore.changeInfoAction(1, 'hxl', 18)
 // 删掉观察(依赖), 下次 info 数据发生改变不会执行 infoCallback 回调函数
 myStore.deleteWatch('info', infoCallback)
 
-myStore.changeInfoAction(2, 'code', 18)
+myStore.changeInfoAction(2, 'codehxl', 18)
 ```
