@@ -62,12 +62,7 @@ export interface IStoreOptionsArg {
 export type IProxyInstanceRes<
   S extends IState,
   A extends IActions<IProxyInstanceRes<S, A>>
-> = S &
-  A &
-  IStoreApi<S> & {
-    id: number
-    trackStore: ITrackStore<S>
-  }
+> = S & A & IStoreApi<S>
 
 
 export default  function xlStore<S extends IState, A extends IActions<IProxyInstanceRes<S, A>>>(

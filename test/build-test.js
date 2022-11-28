@@ -40,3 +40,7 @@ console.log('------------------------------')
 myStore.incrementAction()
 myStore.incrementAction()
 myStore.changeUserInfoAction({ name: 'coderhxl', age: 18 })
+
+myStore.deleteWatch('count', getCount)
+
+myStore.incrementAction()

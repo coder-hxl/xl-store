@@ -1,20 +1,26 @@
 {
   "name": "xl-store",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "状态管理仓库",
   "scripts": {
-    "build-esm": "node ./script/build.js esm",
-    "build-cjs": "node ./script/build.js cjs",
-    "test": "node script/test.js",
+    "build": "rollup --config rollup.config.mjs",
+    "test": "rollup --watch --config script/test.mjs",
     "build-test": "node test/build-test.js",
     "prettier": "prettier --write ."
   },
   "author": "coderhxl",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-run": "^3.0.1",
+    "@rollup/plugin-terser": "^0.1.0",
     "@types/node": "^18.11.9",
-    "esbuild": "^0.15.8",
     "prettier": "^2.8.0",
+    "rollup": "^3.5.0",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "tslib": "^2.4.1",
     "typescript": "^4.9.3"
   }
 }
