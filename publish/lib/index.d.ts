@@ -64,8 +64,15 @@ export type IProxyInstanceRes<
   A extends IActions<IProxyInstanceRes<S, A>>
 > = S & A & IStoreApi<S>
 
+export type IXlStore = <
+  S extends IState,
+  A extends IActions<IProxyInstanceRes<S, A>>
+>(
+  store: IStoreArgs<S, A>,
+  options?: IStoreOptionsArg
+) => IProxyInstanceRes<S, A>
 
-export default  function xlStore<S extends IState, A extends IActions<IProxyInstanceRes<S, A>>>(
+export default function xlStore<S extends IState, A extends IActions<IProxyInstanceRes<S, A>>>(
   store: IStoreArgs<S, A>,
   options?: IStoreOptionsArg
 ): IProxyInstanceRes<S, A>

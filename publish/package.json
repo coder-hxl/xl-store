@@ -1,12 +1,12 @@
 {
   "name": "xl-store",
   "version": "0.1.11",
-  "description": "状态管理仓库",
+  "author": "coderhxl",
+  "description": "状态管理库",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "miniprogram": "lib",
-  "author": "coderhxl",
-  "license": "MIT",
   "homepage": "https://github.com/coder-hxl/xl-store/tree/master/publish",
   "repository": {
     "type": "git",
