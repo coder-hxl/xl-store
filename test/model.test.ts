@@ -1,7 +1,18 @@
+import process from 'process'
 import { expect, test } from '@jest/globals'
+import { IXlStore } from '../src/types'
 
-import xlStore from '../src'
+const args = process.argv.splice(3)
+const model = args[0]
 
+let xlStore: IXlStore
+if (model === 'dev') {
+  xlStore = require('../src/index').default
+} else if (model === 'pro') {
+  xlStore = require('../publish/lib')
+}
+
+/* test */
 function testWatchAPI() {
   const record = [
     { name: 'count', count: 0, value: null },
