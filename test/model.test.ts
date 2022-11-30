@@ -10,7 +10,7 @@ let xlStore: IXlStore
 if (model === 'dev') {
   xlStore = require('../src').default
 } else if (model === 'pro') {
-  xlStore = require('../publish/lib')
+  xlStore = require('../publish/dist')
 }
 
 /* test */

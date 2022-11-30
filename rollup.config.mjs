@@ -3,12 +3,12 @@ import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 
 const outputMap = [
   {
-    file: 'publish/lib/index.js',
-    format: 'cjs'
+    file: 'publish/dist/index.mjs',
+    format: 'es'
   },
   {
-    file: 'publish/lib/index.mjs',
-    format: 'es'
+    file: 'publish/dist/index.js',
+    format: 'cjs'
   }
 ].map((item) => {
   return { ...item, compact: true }
