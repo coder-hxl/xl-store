@@ -8,10 +8,10 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "rollup --config rollup.config.mjs",
-    "build-strict": "pnpm dev-test && pnpm build && pnpm pro-test",
-    "test": "rollup --watch --config script/test.mjs",
-    "dev-test": "jest test/model.test.ts dev",
-    "pro-test": "jest test/model.test.ts pro",
+    "build-strict": "pnpm test-dev && pnpm build && pnpm test-pro",
+    "test-debug": "rollup --watch --config script/debug.mjs",
+    "test-dev": "jest test/model.test.ts dev",
+    "test-pro": "jest test/model.test.ts pro --coverage=false",
     "prettier": "prettier --write ."
   },
   "devDependencies": {

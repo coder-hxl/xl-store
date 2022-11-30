@@ -1,5 +1,6 @@
 import process from 'process'
 import { expect, test } from '@jest/globals'
+
 import { IXlStore } from '../src/types'
 
 const args = process.argv.splice(3)
@@ -7,7 +8,7 @@ const model = args[0]
 
 let xlStore: IXlStore
 if (model === 'dev') {
-  xlStore = require('../src/index').default
+  xlStore = require('../src').default
 } else if (model === 'pro') {
   xlStore = require('../publish/lib')
 }
