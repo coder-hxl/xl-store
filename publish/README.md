@@ -36,7 +36,7 @@ pnpm add xl-store
 
 #### Options
 
-* isDeepWatch:  Boolean
+- isDeepWatch: Boolean
 
   默认为 false ，当 State 中的内部值发生改变也执行收集的依赖（传给 watch 的回调函数）。
 
@@ -44,25 +44,25 @@ pnpm add xl-store
 
 #### watch
 
-* Key: String
+- Key: String | String[]
 
-* Callback: Function
+- Callback: Function
 
 对 State 中某个数据开启监听，当数据发生改变时会执行 Callback ，并将 Key 和 NewValue 当作参数传给 Callback 。
 
 #### watchEffect
 
-* Key: String
+- Key: String | String[]
 
-* Callback: Function
+- Callback: Function
 
 与 Watch API 一样，不同的是，其会先立刻执行一次 Callback 。
 
 #### deleteWatch
 
-* Key: String
+- Key: String | String[]
 
-* Callback: Function
+- Callback: Function
 
 删除对 State 中某个数据监听 。
 

@@ -44,7 +44,7 @@ pnpm add xl-store
 
 #### watch
 
-- Key: String
+- Key: String | String[]
 
 - Callback: Function
 
@@ -52,7 +52,7 @@ pnpm add xl-store
 
 #### watchEffect
 
-- Key: String
+- Key: String | String[]
 
 - Callback: Function
 
@@ -60,7 +60,7 @@ pnpm add xl-store
 
 #### deleteWatch
 
-- Key: String
+- Key: String | String[]
 
 - Callback: Function
 
