@@ -1,5 +1,4 @@
 import tsPlugin from 'rollup-plugin-typescript2'
-import terserPlugin from '@rollup/plugin-terser'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 
 const outputMap = [
@@ -24,7 +23,6 @@ export default {
     tsPlugin(),
     getBabelOutputPlugin({
       presets: [['@babel/preset-env', { bugfixes: true }]]
-    }),
-    terserPlugin()
+    })
   ]
 }
