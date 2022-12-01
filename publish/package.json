@@ -1,12 +1,12 @@
 {
   "name": "xl-store",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "author": "coderhxl",
   "description": "状态管理库",
   "license": "MIT",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "miniprogram": "lib",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "miniprogram": "dist",
   "homepage": "https://github.com/coder-hxl/xl-store/tree/master/publish",
   "repository": {
     "type": "git",
@@ -15,8 +15,8 @@
   "scripts": {},
   "exports": {
     ".": {
-      "import": "./lib/index.mjs",
-      "require": "./lib/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "keywords": [

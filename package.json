@@ -1,7 +1,7 @@
 {
   "private": "true",
   "name": "xl-store",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "author": "coderhxl",
   "description": "状态管理库",
   "license": "MIT",
