@@ -1,46 +1,101 @@
 # xl-store
 
-状态管理库
+xl-store 是一个可 深浅 观察的状态管理库。
+
+## 特征
+
+- 可深浅观察
+- 支持在微信小程序使用
+- 用法简单
 
 ## 安装
 
-使用 NPM:
+以 NPM 为例:
 
 ```shell
 npm install xl-store
 ```
 
-使用 Yarn:
+## 示例
 
-```shell
-yarn add xl-store
-```
+```JavaScript
+// 1.导入 xlStore
+import xlStore from 'xl-store'
+// const xlStore = require('xlStore')
 
-使用 PNPM:
+// 2.定义一个仓库
+const myStore = xlStore({
+  state: {
+    // 存放数据
+    info: {}
+  },
+  actions: {
+    // 存放改变state的函数
+    changeInfoAction(id, name, age) {
+      // this指向state
+      this.info = { id, name, age }
+    }
+  }
+}, {
+  // 深观察, 当 state 的 info 里面的某个属性的值发生改变也会执行收集的依赖
+  isDeepWatch: true
+})
 
-```shell
-pnpm add xl-store
+function infoCallback1(key, value) {
+  console.log('watch-info1', key, value)
+}
+
+function infoCallback2(key, value) {
+  console.log('watch-info2', key, value)
+}
+
+// 添加观察(依赖)
+myStore.watch('info', infoCallback1)
+
+// 添加观察(依赖), 会先执行一下 infoCallback2
+myStore.watchEffect('info', infoCallback2)
+
+// 修改 state 的 info , 改完后会执行 infoCallback1 和 infoCallback2 回调函数
+myStore.changeInfoAction(1, 'hxl', 18)
+
+// 删掉观察(依赖)，删除 infoCallback1 回调函数
+myStore.deleteWatch('info', infoCallback1)
+
+// 修改 state 的 info , 改完后不会执行 infoCallback1 回调函数， 但会执行 infoCallback2 回调函数
+myStore.changeInfoAction(2, 'codehxl', 19)
 ```
 
 ## 核心概念
 
-### Arguments
+### xlStore
 
-#### State
+创建一个仓库。
 
-存放需要 管理/共享 的数据。
+#### 参数
 
-#### Actions
+##### Content
 
-存放改变 State 数据的函数, 可通过 this 拿到 State 中存放的数据。
+包含两个参数：
 
-#### Options
+- State: Object
+
+  存放需要 管理/共享 的数据。
+
+- Actions: Object
+
+  存放改变 State 数据的函数, 可通过 this 拿到 State 中存放的数据。
+
+##### Options
+
+包含一个参数：
 
 - isDeepWatch: Boolean
 
   默认为 false ，当 State 中的内部值发生改变也执行收集的依赖（传给 watch 的回调函数）。
 
 ### API
+
+仓库的 API 。
 
 #### watch
 
@@ -65,45 +120,3 @@ pnpm add xl-store
 - Callback: Function
 
 删除对 State 中某个数据监听 。
-
-## 使用
-
-```JavaScript
-// 1.导入 xlStore
-import xlStore from 'xlStore'
-// const xlStore = require('xlStore')
-
-// 2.使用
-const myStore = xlStore({
-  state: {
-    // 存放数据
-    info: {}
-  },
-  actions: {
-    // 存放改变state的函数
-    changeInfoAction(id, name, age) {
-      // this指向state
-      this.info = { id, name, age }
-    }
-  }
-}, {
-  // 当 state 内部值发生改变也执行收集的依赖
-  isDeepWatch: true
-})
-
-function infoCallback(key, value) {
-  console.log('watch-info', key, value)
-}
-
-// 添加观察(依赖), 当 info 数据发生改变会执行 infoCallback 回调函数
-myStore.watch('info', infoCallback)
-// 添加观察(依赖), 会先执行一次 infoCallback , 数据发生改变会执行 infoCallback 回调函数
-myStore.watchEffect('info', infoCallback)
-
-myStore.changeInfoAction(1, 'hxl', 18)
-
-// 删掉观察(依赖), 下次 info 数据发生改变不会执行 infoCallback 回调函数
-myStore.deleteWatch('info', infoCallback)
-
-myStore.changeInfoAction(2, 'codehxl', 18)
-```
