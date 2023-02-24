@@ -19,9 +19,8 @@ npm install xl-store
 ## 示例
 
 ```JavaScript
-// 1.导入 xlStore
+// 1.导入模块 ES/CJS
 import xlStore from 'xl-store'
-// const xlStore = require('xlStore')
 
 // 2.定义一个仓库
 const myStore = xlStore({
@@ -75,7 +74,7 @@ myStore.changeInfoAction(2, 'codehxl', 19)
 
 ##### Content
 
-包含两个参数：
+接收两个参数：
 
 - State: Object
 
@@ -87,7 +86,7 @@ myStore.changeInfoAction(2, 'codehxl', 19)
 
 ##### Options
 
-包含一个参数：
+接收一个参数：
 
 - isDeepWatch: Boolean
 
@@ -99,6 +98,8 @@ myStore.changeInfoAction(2, 'codehxl', 19)
 
 #### watch
 
+函数接收两个参数:
+
 - Key: String | String[]
 
 - Callback: Function
@@ -107,6 +108,8 @@ myStore.changeInfoAction(2, 'codehxl', 19)
 
 #### watchEffect
 
+函数接收两个参数:
+
 - Key: String | String[]
 
 - Callback: Function
@@ -114,6 +117,8 @@ myStore.changeInfoAction(2, 'codehxl', 19)
 与 Watch API 一样，不同的是，其会先立刻执行一次 Callback 。
 
 #### deleteWatch
+
+函数接收两个参数:
 
 - Key: String | String[]
 
